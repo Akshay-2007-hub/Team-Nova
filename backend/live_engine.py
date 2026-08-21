@@ -99,14 +99,14 @@ def camera_loop():
     global latest_data, latest_frame
 
     baseline = load_baseline()
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture("demo.mp4")
 
     if not cap.isOpened():
-        print("ERROR: Cannot open webcam")
+        print("ERROR: Cannot open demo.mp4")
         latest_data["status"] = "CAMERA_ERROR"
         return
 
-    print("VayuMitra X Live Camera Engine Started (Advanced MOG2 + DB + Weather)")
+    print("VayuMitra X Live Camera Engine Started (Simulation Video Mode)")
 
     previous_brightness = baseline["brightness"]
     backSub = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=16, detectShadows=False)
@@ -116,7 +116,7 @@ def camera_loop():
     while True:
         success, frame = cap.read()
         if not success:
-            time.sleep(1)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
             continue
 
         frame = cv2.flip(frame, 1)
