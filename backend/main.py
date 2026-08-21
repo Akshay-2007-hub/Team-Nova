@@ -1,5 +1,6 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import asyncio
@@ -26,7 +27,7 @@ def startup_event():
     print("Starting VayuMitra X backend...")
     start_camera()
 
-@app.get("/")
+@app.get("/api/info")
 def home():
     return {
         "project": "VayuMitra X",
@@ -127,3 +128,11 @@ async def websocket_endpoint(websocket: WebSocket):
             await asyncio.sleep(0.5) # send data 2 times a second
     except WebSocketDisconnect:
         print("Client disconnected")
+
+# Serve the frontend (must be at the end to not override API routes)
+import os
+frontend_path = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+else:
+    print(f"WARNING: Frontend dist directory not found at {frontend_path}")
